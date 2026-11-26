@@ -1,0 +1,48 @@
+:root{--bg:#cfdadd;--panel:#f6f9f9;--ink:#1b2a41;--mute:#5b6b7d;--teal:#3f6f73;--note:#ffe45e;--red:#d6322f;--line:#9fb3b8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17252b;--panel:#22343b;--ink:#eaf2f3;--mute:#9db3b8;--teal:#4f8a8f;--line:#41585f}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,sans-serif;line-height:1.5}
+#app{max-width:980px;margin:0 auto;padding:16px}
+h1{font-weight:800;font-size:clamp(28px,6vw,46px);line-height:1.1;margin:8px 0 4px;letter-spacing:-.02em}
+h2{font-size:18px;margin:0 0 8px}
+p.sub{margin:0 0 16px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:260px 1fr;gap:18px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.stage{background:var(--teal);border-radius:14px;padding:14px 10px 0;text-align:center;border:2px solid var(--ink);min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;overflow:hidden}
+.stage .tag{background:var(--note);color:#1b2a41;font-weight:800;padding:2px 12px;transform:rotate(-3deg);margin-bottom:6px;font-size:14px}
+.stage svg{height:260px;width:auto;display:block}
+.panel{background:var(--panel);border:2px solid var(--ink);border-radius:14px;padding:14px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button,.chip{font:inherit;cursor:pointer;border:2px solid var(--ink);background:var(--panel);color:var(--ink);padding:5px 12px;border-radius:8px;font-weight:600}
+.tabs button.on,.chip.on{background:var(--ink);color:var(--panel)}
+.row{margin:10px 0}
+.row label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px solid var(--ink);border-radius:8px;background:var(--panel);color:var(--ink)}
+.go{font:inherit;font-weight:800;font-size:18px;background:var(--red);color:#fff;border:2px solid var(--ink);padding:12px 22px;border-radius:10px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);margin-top:14px}
+.go:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.go.alt{background:var(--panel);color:var(--ink)}
+:focus-visible{outline:3px solid #ff9f1c;outline-offset:2px}
+.hud{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
+.bar{flex:1 1 150px}
+.bar b{font-size:13px}
+.bar i{display:block;height:14px;border:2px solid var(--ink);border-radius:8px;background:var(--panel);overflow:hidden}
+.bar i u{display:block;height:100%;transition:width .4s;text-decoration:none}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px;margin:0 0 12px;color:var(--mute)}
+.stats b{color:var(--ink)}
+.bubble{background:#fff;color:#1b2a41;border:2px solid var(--ink);border-radius:12px;padding:8px 12px;font-weight:600;font-size:14px;max-width:240px;margin-bottom:8px;min-height:44px}
+.work{animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-2deg)}75%{transform:translateX(6px) rotate(2deg)}}
+@media(prefers-reduced-motion:reduce){.work{animation:none}}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:12px}
+.note{font:inherit;text-align:left;background:var(--note);color:#1b2a41;border:0;padding:12px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:3px 4px 0 rgba(0,0,0,.35);transform:rotate(var(--r,0deg))}
+.note:hover{transform:rotate(0) scale(1.03)}
+.note small{display:block;font-weight:400;margin-top:6px;opacity:.75}
+.log{max-height:170px;overflow:auto;border-top:2px dashed var(--line);padding-top:8px;font-size:14px}
+.log p{margin:3px 0}
+.log .bad{color:var(--red);font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.paper{background:#fffef6;color:#1b2a41;max-width:420px;padding:22px;border:2px solid #1b2a41;transform:rotate(-1deg)}
+.paper h2{text-align:center;text-decoration:underline}
+.toast{margin-top:10px;color:var(--red);font-weight:800;min-height:24px}
