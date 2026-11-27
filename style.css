@@ -46,3 +46,6 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 .paper{background:#fffef6;color:#1b2a41;max-width:420px;padding:22px;border:2px solid #1b2a41;transform:rotate(-1deg)}
 .paper h2{text-align:center;text-decoration:underline}
 .toast{margin-top:10px;color:var(--red);font-weight:800;min-height:24px}
+
+.stage,.panel{box-shadow:5px 5px 0 var(--ink)}
+.stage{background:linear-gradient(180deg,#9fc4c8 0 62%,#3f6f73 62% 100%)}

@@ -1,3 +1,13 @@
 # Đảo Vai Văn Phòng
 
-Game nhập vai văn phòng. Chạy thử: mở index.html hoặc `python3 -m http.server`.
+Cấu trúc phẳng (không thư mục con):
+- index.html, style.css
+- main.js: điều khiển màn hình
+- data.js: nhiệm vụ, lời thoại, tuỳ chọn ngoại hình
+- avatar.js: vẽ nhân vật
+- state.js: trạng thái + lưu localStorage
+
+Chạy thử: `python3 -m http.server` rồi mở localhost:8000 (module cần chạy qua server, không mở file trực tiếp).
+
+## Phong cách đồ họa
+Hoạt hình phẳng, viền xanh đen #1b2a41 dày 2.4, bóng đổ cứng 5px. Bảng màu: nền #cfdadd, xanh vách #3f6f73, giấy nhớ #ffe45e, đỏ #d6322f, mực #1b2a41. Font: Be Vietnam Pro.
