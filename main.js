@@ -1,20 +1,21 @@
 import {OPT,LAB,ROLES,POOL,OKS,MAD,LEAVE} from './data.js';
 import {av,parse} from './avatar.js';
+import {scene} from './scene.js';
 import {S,saveChar,loadChar,saveGame,loadGame,hasGame} from './state.js';
 const $=s=>document.querySelector(s);
 function setup(){saveChar();
  const o=S[S.tab],mine=S.tab=='me';
  const rows=Object.keys(OPT).map(k=>`<div class="row"><label>${LAB[k]}</label><div class="chips">${OPT[k].map(([l,v])=>`<button class="chip ${o[k]==v?'on':''}" onclick="pick('${k}','${v}')">${l}</button>`).join('')}</div></div>`).join('');
  $('#app').innerHTML=`<h1>Đảo Vai Văn Phòng</h1><p class="sub">Hôm nay anh sếp cũ làm nhân viên. Còn bạn là người ký duyệt.</p>
- <div class="grid"><div class="stage"><span class="tag">${mine?(o.name||'Bạn')+' · '+S.role:'Nhân viên '+(o.name||'???')}</span>${av(o,'ok')}</div>
+ <div class="grid"><div class="stage"><div class="scene">${scene(10,0)}</div><span class="tag">${mine?(o.name||'Bạn')+' · '+S.role:'Nhân viên '+(o.name||'???')}</span>${av(o,'ok')}</div>
  <div class="panel"><div class="tabs"><button class="${mine?'on':''}" onclick="tab('me')">Bạn (sếp mới)</button><button class="${mine?'':'on'}" onclick="tab('boss')">Sếp cũ (nhân viên)</button></div>
  <div class="row"><label>Tên ${mine?'của bạn':'sếp cũ'}</label><input type="text" maxlength="20" value="${o.name}" placeholder="${mine?'Ví dụ: Lan':'Ví dụ: Hùng'}" oninput="setName(this.value)"></div>
  ${mine?`<div class="row"><label>Chức vụ</label><div class="chips">${ROLES.map(r=>`<button class="chip ${S.role==r?'on':''}" onclick="S.role='${r}';setup()">${r}</button>`).join('')}</div></div>`:''}
  <div class="row"><label>Hoặc mô tả bằng lời</label><textarea rows="2" id="d" placeholder="Ví dụ: béo, lùn, tóc bạc, đeo kính, áo đỏ">${o.desc}</textarea><button class="chip" style="margin-top:6px" onclick="applyDesc()">Tạo theo mô tả</button></div>
- ${rows}<button class="go" onclick="start(true)">Ca làm việc mới</button>${hasGame()?' <button class="go alt" onclick="start(false)">Tiếp tục ca cũ</button>':''}</div></div>`;
+ <div class="row"><button class="chip" onclick="randomize()">Ngẫu nhiên cả bộ</button></div>${rows}<button class="go" onclick="start(true)">Ca làm việc mới</button>${hasGame()?' <button class="go alt" onclick="start(false)">Tiếp tục ca cũ</button>':''}</div></div>`;
 }
 function tab(t){S.tab=t;setup()}
-function pick(k,v){const o=S[S.tab];o[k]=(k=='hair'||k=='shirt')?v:+v;setup()}
+function pick(k,v){const o=S[S.tab];o[k]=['hair','shirt','skin'].includes(k)?v:+v;setup()}
 function applyDesc(){const o=S[S.tab];o.desc=$('#d').value;parse(o.desc,o);setup()}
 
 let G,hand=[],busy=false;
@@ -24,7 +25,7 @@ function start(fresh=true){
  const NEW={en:100,mad:20,pow:0,lies:0,broke:0,money:0,rej:0};G=fresh?NEW:(loadGame()||NEW);
  $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div></div>
  <p class="stats" id="st"></p>
- <div class="grid"><div class="stage" id="stg"><div class="bubble" id="bub"></div><div id="av"></div><span class="tag" id="tg"></span></div>
+ <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub"></div><div id="av"></div><span class="tag" id="tg"></span></div>
  <div class="panel"><h2>${S.me.name} ${S.role} giao việc hôm nay</h2><div class="notes" id="notes"></div>
  <button class="go alt" style="margin:0 6px 12px 0;font-size:15px;padding:8px 14px" onclick="lie()">Vẽ bánh: hứa thăng chức</button><button class="go alt" style="margin:0 0 12px;font-size:15px;padding:8px 14px" onclick="rest()">Cho nghỉ 5 phút</button>
  <div class="log" id="log"></div></div></div><div id="m"></div>`;
@@ -37,18 +38,18 @@ function deal(){
  $('#notes').innerHTML=hand.map((t,i)=>`<button class="note" style="--r:${[-2,1.5,-1,2.5][i]}deg" onclick="act(${i})">${t[0]}<small>Tốn ${t[2]} sức · +${t[5]} quyền lực</small></button>`).join('');
 }
 function mood(){return G.mad>=90?'cry':G.mad>=65?'angry':G.en<30?'tired':'ok'}
-function draw(m){saveGame(G);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
+function draw(m){saveGame(G);$('#sc').innerHTML=scene(8+((G.t||0)%10),G.t||0);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
  $('#b1').style.width=G.en+'%';$('#b2').style.width=G.mad+'%';
  const r=G.pow<100?'Sếp tập sự':G.pow<300?'Sếp thứ thiệt':G.pow<600?'Sếp độc tài':'Bạo chúa văn phòng';
- $('#st').innerHTML=`<span>Danh hiệu: <b>${r}</b></span><span>Quyền lực: <b>${G.pow}</b></span><span>Đồ vỡ: <b>${G.broke}</b></span><span>Trừ lương: <b>${G.money.toLocaleString('vi-VN')}đ</b></span><span>Đơn nghỉ bị xé: <b>${G.rej}</b></span><span>Bánh vẽ: <b>${G.lies}</b></span>`}
+ $('#st').innerHTML=`<span>Giờ: <b>${8+((G.t||0)%10)}:00</b></span><span>Danh hiệu: <b>${r}</b></span><span>Quyền lực: <b>${G.pow}</b></span><span>Đồ vỡ: <b>${G.broke}</b></span><span>Trừ lương: <b>${G.money.toLocaleString('vi-VN')}đ</b></span><span>Đơn nghỉ bị xé: <b>${G.rej}</b></span><span>Bánh vẽ: <b>${G.lies}</b></span>`}
 function say(t){$('#bub').textContent=t}
 function log(t,bad){const p=document.createElement('p');p.textContent=t;if(bad)p.className='bad';$('#log').prepend(p)}
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
-function wob(){const a=$('#av');a.classList.remove('work');void a.offsetWidth;a.classList.add('work')}
+function wob(){const a=$('#av');a.classList.add('bowing');setTimeout(()=>a.classList.remove('bowing'),900)}
 
 function act(i){
  if(busy||!G)return;const t=hand[i];
- G.en=Math.max(0,G.en-t[2]);G.mad=Math.min(100,G.mad+t[3]);G.pow+=t[5];
+ G.en=Math.max(0,G.en-t[2]);G.mad=Math.min(100,G.mad+t[3]);G.pow+=t[5];G.t=(G.t||0)+1;
  wob();log(`Giao: ${t[0]}.`);
  if(Math.random()<t[4]){const c=(2+Math.floor(Math.random()*8))*50000;G.broke++;G.money+=c;
   log(`Choang! ${S.boss.name} làm vỡ ${t[1]}. Trừ lương ${c.toLocaleString('vi-VN')}đ.`,1);say('Á! Em không cố ý đâu ạ!')}
@@ -73,6 +74,7 @@ function rej(){
  log(`Bạn xé đơn xin nghỉ việc lần thứ ${G.rej}. Tăng KPI cho ${S.boss.name}.`,1);say('...Dạ vâng. Em hiểu rồi ạ.');draw();deal();
 }
 
+function randomize(){const o=S[S.tab];for(const k of Object.keys(OPT)){const a=OPT[k];o[k]=a[Math.floor(Math.random()*a.length)][1]}setup()}
 function setName(v){S[S.tab].name=v;saveChar()}
-Object.assign(window,{S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+Object.assign(window,{randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
 loadChar();setup();

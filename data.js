@@ -2,13 +2,17 @@
 export const OPT={
  body:[['Gầy',0],['Vừa',1],['Béo',2]],
  h:[['Thấp',0],['Vừa',1],['Cao',2]],
- hs:[['Tóc ngắn',0],['Hói',1],['Tóc dài',2]],
+ hs:[['Tóc ngắn',0],['Hói',1],['Tóc dài',2],['Tóc xoăn',3],['Đuôi ngựa',4],['Rẽ ngôi',5]],
  hair:[['Đen','#222'],['Bạc','#cfd3d8'],['Nâu','#6b4226'],['Đỏ','#b3382c'],['Vàng','#d9a93a']],
  gl:[['Không kính',0],['Đeo kính',1]],
  shirt:[['Trắng','#f4f4f0'],['Xanh','#3b73c4'],['Hồng','#e58aa9'],['Đen','#26272b'],['Đỏ','#c9302c'],['Vàng','#e8b93a']],
- tie:[['Không',0],['Cà vạt',1]]
+ tie:[['Không',0],['Cà vạt',1]],
+ skin:[['Sáng','#f9d5b4'],['Vừa','#f1c9a0'],['Ngăm','#c98f63'],['Nâu','#8d5a3b']],
+ beard:[['Không râu',0],['Râu quai nón',1],['Ria mép',2]],
+ acc:[['Không',0],['Khẩu trang',1],['Mũ lưỡi trai',2]],
+ top:[['Sơ mi',0],['Áo thun',1],['Vest',2]]
 };
-export const LAB={body:'Dáng người',h:'Chiều cao',hs:'Kiểu tóc',hair:'Màu tóc',gl:'Kính',shirt:'Màu áo',tie:'Cà vạt'};
+export const LAB={body:'Dáng người',h:'Chiều cao',hs:'Kiểu tóc',hair:'Màu tóc',gl:'Kính',shirt:'Màu áo',tie:'Cà vạt',skin:'Màu da',beard:'Râu',acc:'Phụ kiện',top:'Kiểu áo'};
 export const ROLES=['Giám đốc','Tổng giám đốc','Trưởng phòng','Phó phòng','Chủ tịch'];
 export const POOL=[
  ['Pha cà phê, chê nhạt, bắt pha lại','ly',12,10,.15,12],

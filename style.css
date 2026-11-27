@@ -48,4 +48,28 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 .toast{margin-top:10px;color:var(--red);font-weight:800;min-height:24px}
 
 .stage,.panel{box-shadow:5px 5px 0 var(--ink)}
-.stage{background:linear-gradient(180deg,#9fc4c8 0 62%,#3f6f73 62% 100%)}
+.stage{background:#cfe0e3}
+.scene{position:absolute;inset:0;z-index:0}.scene svg{width:100%;height:100%;display:block}
+.stage>*:not(.scene){position:relative;z-index:1}
+.gg{grid-template-columns:340px 1fr}.gg .stage{min-height:420px}
+@media(max-width:720px){.gg{grid-template-columns:1fr}}
+.work{animation:none}
+.fig,.bd,.hd,.eyes{transform-box:fill-box}
+.bd{transform-origin:50% 100%;animation:br 3.2s ease-in-out infinite}
+.hd{transform-origin:50% 100%;animation:hb 3.2s ease-in-out infinite}
+.eyes{transform-origin:50% 50%;animation:bl 4.5s infinite}
+.fig{transform-origin:50% 100%}
+.bowing .fig{animation:bow .7s ease-out}
+.m-tired .hd{transform-origin:50% 100%;animation:droop 2.6s ease-in-out infinite}
+.m-angry .hd{animation:fume .22s infinite alternate}
+.m-cry .hd{animation:sob .5s infinite alternate}
+.tear,.sweat{animation:drip 1.6s infinite}
+@keyframes br{50%{transform:scaleY(1.015)}}
+@keyframes hb{50%{transform:translateY(-1.2px)}}
+@keyframes bl{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
+@keyframes bow{40%{transform:rotate(8deg) translateY(2px)}}
+@keyframes droop{50%{transform:rotate(5deg) translateY(2px)}}
+@keyframes fume{from{transform:translateX(-.8px)}to{transform:translateX(.8px)}}
+@keyframes sob{from{transform:translateY(0)}to{transform:translateY(1.6px)}}
+@keyframes drip{0%{opacity:0;transform:translateY(-3px)}30%{opacity:1}100%{opacity:0;transform:translateY(10px)}}
+@media(prefers-reduced-motion:reduce){.fig,.bd,.hd,.eyes,.tear,.sweat{animation:none!important}}
