@@ -33,3 +33,21 @@ export const POOL=[
 export const OKS=['Dạ... vâng ạ.','Em làm ngay, thưa sếp.','(thở dài thườn thượt) Vâng...','Dạ, đang làm... đang làm...','Hôm qua em cũng làm cái này mà...'];
 export const MAD=['Chỗ này đáng lương hơn chứ nhỉ...','Em là nhân viên chứ không phải con quay ạ!','Hồi em làm sếp em đâu có thế này!','Sếp có biết tay em sắp rụng không?','Thế này là bóc lột sức lao động!'];
 export const LEAVE=['Tôi đau lưng, đau tay, và đau cả lòng.','Tôi muốn đi trồng rau.','Tôi cần thời gian để tìm lại chính mình.','Công ty này sai khiến tôi hơn cả mẹ tôi.'];
+
+// Lịch tuần: mỗi thứ có một "hiệu ứng ngày" (em: sức tốn thêm, md: bực thêm, pm: nhân quyền lực)
+export const DAYS=[
+ {name:'Thứ Hai',note:'Thứ Hai u ám: nhân viên bực thêm 4 mỗi việc.',md:4},
+ {name:'Thứ Ba',note:'Thứ Ba bình thường. Không có gì đặc biệt (đáng sợ).'},
+ {name:'Thứ Tư',note:'Giữa tuần mệt mỏi: mỗi việc tốn thêm 3 sức.',em:3},
+ {name:'Thứ Năm',note:'Chạy deadline: quyền lực +30% mỗi việc.',pm:1.3},
+ {name:'Thứ Sáu',note:'Sắp nghỉ cuối tuần: nhân viên bớt bực 2 mỗi việc.',md:-2}
+];
+// Sự kiện theo giờ: khi đồng hồ chạm mốc h thì xảy ra (e: sức, m: bực, p: quyền lực)
+export const SCHEDULE=[
+ [{h:9,t:'Họp giao ban: bạn bảo sếp cũ đứng ghi biên bản và rót trà cho cả phòng.',say:'Dạ... em ghi kịp rồi ạ.',e:-8,m:6,p:10},{h:13,t:'Sau bữa trưa, bạn giao thêm "việc nhỏ" lúc ai cũng buồn ngủ.',say:'Em cũng buồn ngủ mà sếp...',e:-5,m:5,p:8}],
+ [{h:10,t:'Khách đến thăm: sếp cũ phải cười tươi bưng nước, bạn đứng nhận công.',say:'Dạ, mời quý khách... (nghiến răng)',e:-6,m:8,p:15},{h:15,t:'Bạn đổi chỗ ngồi của sếp cũ sang cạnh máy hủy giấy ồn ào.',say:'Tai em ù rồi sếp ơi...',e:-4,m:6,p:10}],
+ [{h:9,t:'Bạn đặt mục tiêu mới "cao hơn mục tiêu cũ nhưng nguồn lực như cũ".',say:'Mục tiêu này... có thật không ạ?',e:-6,m:7,p:12},{h:14,t:'Máy lạnh hỏng, bạn bảo sếp cũ đứng quạt cho cả phòng.',say:'Em là nhân viên chứ không phải quạt máy...',e:-10,m:8,p:10}],
+ [{h:11,t:'Chạy deadline: bạn nhắn "gấp" vào nhóm chat 14 lần trong 1 giờ.',say:'Em thấy rồi ạ! Em thấy cả 14 tin rồi ạ!',e:-8,m:9,p:20},{h:16,t:'Hết giờ làm, bạn bảo "xong việc này rồi về".',say:'Việc này... hết bao giờ ạ?',e:-6,m:8,p:12}],
+ [{h:12,t:'Sinh nhật phòng: bạn bảo sếp cũ đi mua bánh kem và tự ứng tiền.',say:'Dạ... để em ứng trước...',e:-5,m:5,p:10},{h:16,t:'Thứ Sáu: cả phòng về sớm, riêng sếp cũ ở lại "dọn dẹp".',say:'Mọi người về cả rồi sao...',e:-8,m:10,p:15}]
+];
+export const BYE=['Em xin phép về... em còn bài tập sếp giao hôm qua.','Em về nhé. Mai em lại đến đúng giờ, như một con robot.','Sếp ơi, em về được chưa? Em mượn xe đạp của bác bảo vệ.','(lê bước ra cửa) Mai... mai nữa... mai mai nữa...'];

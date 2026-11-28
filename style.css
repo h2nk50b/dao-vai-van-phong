@@ -76,3 +76,4 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 .chip,.tabs button{min-height:40px}.note{min-height:64px}
 .ver{text-align:center;color:var(--mute);font-size:12px;margin:10px 0 16px}
 @media(max-width:720px){.gg .stage{min-height:370px}.stage svg{height:220px}}
+.banner{background:var(--note);color:#1b2a41;border:2px solid var(--ink);padding:6px 10px;font-weight:600;font-size:14px;margin:0 0 12px}
