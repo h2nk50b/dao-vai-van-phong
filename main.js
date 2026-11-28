@@ -1,18 +1,18 @@
 import {OPT,LAB,ROLES,POOL,OKS,MAD,LEAVE} from './data.js';
-import {av,parse} from './avatar.js';
+import {av,parse,esc} from './avatar.js';
 import {scene} from './scene.js';
-import {S,saveChar,loadChar,saveGame,loadGame,hasGame} from './state.js';
+import {S,clearAll,saveChar,loadChar,saveGame,loadGame,hasGame} from './state.js';
 const $=s=>document.querySelector(s);
 function setup(){saveChar();
  const o=S[S.tab],mine=S.tab=='me';
  const rows=Object.keys(OPT).map(k=>`<div class="row"><label>${LAB[k]}</label><div class="chips">${OPT[k].map(([l,v])=>`<button class="chip ${o[k]==v?'on':''}" onclick="pick('${k}','${v}')">${l}</button>`).join('')}</div></div>`).join('');
  $('#app').innerHTML=`<h1>Đảo Vai Văn Phòng</h1><p class="sub">Hôm nay anh sếp cũ làm nhân viên. Còn bạn là người ký duyệt.</p>
- <div class="grid"><div class="stage"><div class="scene">${scene(10,0)}</div><span class="tag">${mine?(o.name||'Bạn')+' · '+S.role:'Nhân viên '+(o.name||'???')}</span>${av(o,'ok')}</div>
+ <div class="grid"><div class="stage"><div class="scene">${scene(10,0)}</div><span class="tag">${esc(mine?(o.name||'Bạn')+' · '+S.role:'Nhân viên '+(o.name||'???'))}</span>${av(o,'ok')}</div>
  <div class="panel"><div class="tabs"><button class="${mine?'on':''}" onclick="tab('me')">Bạn (sếp mới)</button><button class="${mine?'':'on'}" onclick="tab('boss')">Sếp cũ (nhân viên)</button></div>
- <div class="row"><label>Tên ${mine?'của bạn':'sếp cũ'}</label><input type="text" maxlength="20" value="${o.name}" placeholder="${mine?'Ví dụ: Lan':'Ví dụ: Hùng'}" oninput="setName(this.value)"></div>
+ <div class="row"><label>Tên ${mine?'của bạn':'sếp cũ'}</label><input type="text" maxlength="20" value="${esc(o.name)}" placeholder="${mine?'Ví dụ: Lan':'Ví dụ: Hùng'}" oninput="setName(this.value)"></div>
  ${mine?`<div class="row"><label>Chức vụ</label><div class="chips">${ROLES.map(r=>`<button class="chip ${S.role==r?'on':''}" onclick="S.role='${r}';setup()">${r}</button>`).join('')}</div></div>`:''}
  <div class="row"><label>Hoặc mô tả bằng lời</label><textarea rows="2" id="d" placeholder="Ví dụ: béo, lùn, tóc bạc, đeo kính, áo đỏ">${o.desc}</textarea><button class="chip" style="margin-top:6px" onclick="applyDesc()">Tạo theo mô tả</button></div>
- <div class="row"><button class="chip" onclick="randomize()">Ngẫu nhiên cả bộ</button></div>${rows}<button class="go" onclick="start(true)">Ca làm việc mới</button>${hasGame()?' <button class="go alt" onclick="start(false)">Tiếp tục ca cũ</button>':''}</div></div>`;
+ <div class="row"><button class="chip" onclick="randomize()">Ngẫu nhiên cả bộ</button></div>${rows}<div class="row"><button class="chip" onclick="wipe()">Xóa dữ liệu đã lưu</button></div><button class="go" onclick="start(true)">Ca làm việc mới</button>${hasGame()?' <button class="go alt" onclick="start(false)">Tiếp tục ca cũ</button>':''}</div></div>`;
 }
 function tab(t){S.tab=t;setup()}
 function pick(k,v){const o=S[S.tab];o[k]=['hair','shirt','skin'].includes(k)?v:+v;setup()}
@@ -25,10 +25,10 @@ function start(fresh=true){
  const NEW={en:100,mad:20,pow:0,lies:0,broke:0,money:0,rej:0};G=fresh?NEW:(loadGame()||NEW);
  $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div></div>
  <p class="stats" id="st"></p>
- <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub"></div><div id="av"></div><span class="tag" id="tg"></span></div>
- <div class="panel"><h2>${S.me.name} ${S.role} giao việc hôm nay</h2><div class="notes" id="notes"></div>
- <button class="go alt" style="margin:0 6px 12px 0;font-size:15px;padding:8px 14px" onclick="lie()">Vẽ bánh: hứa thăng chức</button><button class="go alt" style="margin:0 0 12px;font-size:15px;padding:8px 14px" onclick="rest()">Cho nghỉ 5 phút</button>
- <div class="log" id="log"></div></div></div><div id="m"></div>`;
+ <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub" aria-live="polite"></div><div id="av"></div><span class="tag" id="tg"></span></div>
+ <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="notes" id="notes"></div>
+ <button class="go alt" style="margin:0 6px 12px 0;font-size:15px;padding:8px 14px" onclick="lie()">Vẽ bánh: hứa thăng chức</button><button class="go alt" style="margin:0 0 12px;font-size:15px;padding:8px 14px" onclick="rest()">Cho nghỉ 5 phút</button><button class="go alt" style="margin:0 0 12px 6px;font-size:15px;padding:8px 14px" onclick="menu()">Về menu</button>
+ <div class="log" id="log" role="log"></div></div></div><div id="m"></div>`;
  deal();draw('ok');say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
  log(fresh?`${S.boss.name} đã nhận bàn ở góc khuất cạnh nhà vệ sinh.`:'Tiếp tục ca làm việc đang dở.');
  if(G.mad>=100)resign();
@@ -64,8 +64,8 @@ function rest(){if(!G||busy)return;G.en=Math.min(100,G.en+30);G.pow=Math.max(0,G
 
 function resign(){
  busy=true;draw('cry');
- $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>ĐƠN XIN NGHỈ VIỆC</h2><p>Kính gửi ${S.role} ${S.me.name},</p><p>Tôi, <b>${S.boss.name}</b>, xin nghỉ việc vì: <i>${rnd(LEAVE)}</i></p>
- <p style="text-align:right">Ký tên: ${S.boss.name} (đã khóc)</p>
+ $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>ĐƠN XIN NGHỈ VIỆC</h2><p>Kính gửi ${S.role} ${esc(S.me.name)},</p><p>Tôi, <b>${esc(S.boss.name)}</b>, xin nghỉ việc vì: <i>${rnd(LEAVE)}</i></p>
+ <p style="text-align:right">Ký tên: ${esc(S.boss.name)} (đã khóc)</p>
  <button class="go" style="font-size:16px" onclick="rej()">Không duyệt (xé đơn)</button> <button class="go alt" style="font-size:16px" onclick="ok()">Duyệt</button><div class="toast" id="ts"></div></div></div>`;
 }
 function ok(){$('#ts').textContent='Hệ thống: Bạn không đủ quyền hạn để duyệt đơn này.'}
@@ -75,6 +75,8 @@ function rej(){
 }
 
 function randomize(){const o=S[S.tab];for(const k of Object.keys(OPT)){const a=OPT[k];o[k]=a[Math.floor(Math.random()*a.length)][1]}setup()}
+function menu(){busy=false;$('#m')&&($('#m').innerHTML='');setup()}
+function wipe(){if(confirm('Xóa nhân vật và ca làm việc đã lưu?')){clearAll();location.reload()}}
 function setName(v){S[S.tab].name=v;saveChar()}
-Object.assign(window,{randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+Object.assign(window,{menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
 loadChar();setup();

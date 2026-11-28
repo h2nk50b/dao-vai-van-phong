@@ -1,4 +1,5 @@
 // Vẽ nhân vật SVG nhiều lớp (hoạt hình phẳng, viền đậm). Nhóm .bd = thân, .hd = đầu, .eyes = mắt để làm hoạt ảnh bằng CSS.
+export const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dk=(c,f=.14)=>{const n=parseInt(c.slice(1),16);return '#'+[n>>16&255,n>>8&255,n&255].map(v=>Math.round(v*(1-f)).toString(16).padStart(2,'0')).join('')};
 export function av(o,mood){
  const bw=[24,32,46][o.body],sc=[.88,1,1.1][o.h],sk=o.skin||'#f1c9a0',sd=dk(sk),L='#1b2a41',hr=o.hair,tp=o.top||0,hs=o.hs;
@@ -27,7 +28,7 @@ export function av(o,mood){
  if(tp==1)neck=`<path d="M51 70Q60 84 69 70Z" fill="${sd}" ${sw}/>`;
  if(tp==2)neck=`<path d="M51 70L60 100L69 70Z" fill="#fff" ${sw}/><path d="M51 70L58 104L44 88Z" fill="${dk(o.shirt,.25)}" ${sw}/><path d="M69 70L62 104L76 88Z" fill="${dk(o.shirt,.25)}" ${sw}/>`;
  const gl=o.gl?`<g fill="#fff" fill-opacity=".3" stroke="${L}" stroke-width="2.2"><circle cx="52" cy="47" r="8"/><circle cx="68" cy="47" r="8"/><path d="M44 46L39 45M76 46L81 45" fill="none" stroke-linecap="round"/></g>`:'';
- return `<svg viewBox="0 0 120 200" class="m-${mood}" role="img" aria-label="Nhân vật ${o.name||''}"><g transform="translate(60 196) scale(${sc}) translate(-60 -196)">
+ return `<svg viewBox="0 0 120 200" class="m-${mood}" role="img" aria-label="Nhân vật ${esc(o.name||'')}"><g transform="translate(60 196) scale(${sc}) translate(-60 -196)">
  <ellipse cx="60" cy="194" rx="${bw+16}" ry="5" fill="#000" opacity=".2"/><g class="fig">
  <g class="bd">
  <rect x="${60-bw*.5}" y="136" width="${lw}" height="54" rx="3" fill="#2b3350" ${sw}/><rect x="${60+bw*.05}" y="136" width="${lw}" height="54" rx="3" fill="#2b3350" ${sw}/>

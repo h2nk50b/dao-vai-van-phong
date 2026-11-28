@@ -9,3 +9,4 @@ export function loadChar(){try{const d=JSON.parse(localStorage.getItem(K+'_char'
 export function saveGame(G){try{localStorage.setItem(K+'_game',JSON.stringify(G))}catch(e){}}
 export function loadGame(){try{return JSON.parse(localStorage.getItem(K+'_game'))}catch(e){return null}}
 export function hasGame(){return !!loadGame()}
+export function clearAll(){try{localStorage.removeItem(K+'_char');localStorage.removeItem(K+'_game')}catch(e){}}
