@@ -21,3 +21,6 @@ Mỗi việc tốn 1–2 giờ trong ngày 8h–17h. Hết ngày sang hôm sau; 
 
 ## Chỉ số và sự kiện (v0.11)
 Thêm Lòng trung thành, Lương tâm, Ngân sách. Sự kiện ngẫu nhiên nằm ở events.js (31 sự kiện, có điều kiện theo thứ, giờ, chỉ số). Nhiệm vụ ở data.js (30 việc).
+
+## Âm thanh & hiệu ứng (v0.13)
+audio.js: âm thanh và nhạc nền tự sinh bằng Web Audio (không dùng file). fx.js: hạt giấy, mảnh vỡ, tia sáng, rung màn hình. Tắt/bật ở góc trên bên phải.

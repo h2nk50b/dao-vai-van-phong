@@ -2,6 +2,8 @@ import {OPT,LAB,ROLES,POOL,OKS,MAD,LEAVE,DAYS,SCHEDULE,BYE} from './data.js';
 import {av,parse,esc} from './avatar.js';
 import {scene} from './scene.js';
 import {EVENTS} from './events.js';
+import * as audio from './audio.js';
+import * as fx from './fx.js';
 import {S,clearAll,saveChar,loadChar,saveGame,loadGame,hasGame} from './state.js';
 const $=s=>document.querySelector(s);
 function setup(){saveChar();
@@ -15,7 +17,7 @@ function setup(){saveChar();
  <div class="row"><label>Hoặc mô tả bằng lời</label><textarea rows="2" id="d" placeholder="Ví dụ: béo, lùn, tóc bạc, đeo kính, áo đỏ">${o.desc}</textarea><button class="chip" style="margin-top:6px" onclick="applyDesc()">Tạo theo mô tả</button></div>
  <div class="row"><button class="chip" onclick="randomize()">Ngẫu nhiên cả bộ</button></div>${rows}<div class="row"><button class="chip" onclick="wipe()">Xóa dữ liệu đã lưu</button></div><button class="go" onclick="start(true)">Ca làm việc mới</button>${hasGame()?' <button class="go alt" onclick="start(false)">Tiếp tục ca cũ</button>':''}</div></div>`;
 }
-function tab(t){S.tab=t;setup()}
+function tab(t){audio.sfx('click');S.tab=t;setup()}
 function pick(k,v){const o=S[S.tab];o[k]=['hair','shirt','skin'].includes(k)?v:+v;setup()}
 function applyDesc(){const o=S[S.tab];o.desc=$('#d').value;parse(o.desc,o);setup()}
 
@@ -26,15 +28,16 @@ const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
 const eff=t=>{const W=DAYS[wd()];return{e:t[2]+(W.em||0),b:Math.max(0,Math.round(t[3]*.75)+(W.md||0)),p:Math.round(t[5]*(W.pm||1)),h:t[2]>=18?2:1}};
 
 function start(fresh=true){
+ audio.unlock();
  S.me.name=S.me.name||'Bạn';S.boss.name=S.boss.name||'Hùng';
  G=Object.assign(NEWG(),fresh?{}:(loadGame()||{}));
- $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div></div>
+ $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div><div class="tools"><button class="chip" id="snd" onclick="tgl('sfx')"></button><button class="chip" id="mus" onclick="tgl('mus')"></button></div></div>
  <p class="stats" id="st"></p>
  <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub" aria-live="polite"></div><div id="av"></div><span class="tag" id="tg"></span></div>
  <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="banner" id="bn"></div><div class="notes" id="notes"></div><p class="hint">Mẹo: chạm vào nhân vật để trêu, hoặc kéo giấy nhớ rồi thả vào sếp cũ.</p>
  <button class="go alt" style="margin:0 6px 12px 0;font-size:15px;padding:8px 14px" onclick="lie()">Vẽ bánh: hứa thăng chức</button><button class="go alt" style="margin:0 0 12px;font-size:15px;padding:8px 14px" onclick="rest()">Cho nghỉ 5 phút</button><button class="go alt" style="margin:0 0 12px 6px;font-size:15px;padding:8px 14px" onclick="menu()">Về menu</button>
  <div class="log" id="log" role="log"></div></div></div><div id="m"></div>`;
- busy=false;deal();draw('ok');$('#av').onclick=poke;bindNotes();say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
+ busy=false;fx.mount($('#stg'));syncAudio();audio.music(true);deal();draw('ok');$('#av').onclick=poke;bindNotes();say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
  log(fresh?`${S.boss.name} đã nhận bàn ở góc khuất cạnh nhà vệ sinh.`:'Tiếp tục ca làm việc đang dở.');
  if(G.mad>=100)resign();else if(G.hour>=17)endDay();
 }
@@ -43,7 +46,7 @@ function deal(){
  $('#notes').innerHTML=hand.map((t,i)=>{const x=eff(t);return `<button class="note" style="--r:${[-2,1.5,-1,2.5][i]}deg" data-i="${i}">${t[0]}<small>Tốn ${x.e} sức · ${x.h} giờ · +${x.p} quyền lực</small></button>`}).join('');
 }
 function mood(){return G.mad>=90?'cry':G.mad>=65?'angry':G.en<30?'tired':'ok'}
-function draw(m){saveGame(G);$('#sc').innerHTML=scene(G.hour,G.td);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
+function draw(m){saveGame(G);audio.setMood(m||mood());$('#sc').innerHTML=scene(G.hour,G.td);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
  $('#b1').style.width=G.en+'%';$('#b2').style.width=G.mad+'%';$('#b3').style.width=((G.hour-8)/9*100)+'%';$('#b4').style.width=G.loy+'%';$('#b5').style.width=G.con+'%';$('#tm').textContent='Giờ: '+G.hour+':00';
  $('#bn').textContent=DAYS[wd()].name+': '+DAYS[wd()].note;
  const r=G.pow<100?'Sếp tập sự':G.pow<300?'Sếp thứ thiệt':G.pow<600?'Sếp độc tài':'Bạo chúa văn phòng';
@@ -58,20 +61,20 @@ function act(i){
  const lo=G.loy<25?2:G.loy>=75?-2:0,cr=x.b>=16?1:0;
  G.en=clamp(G.en-x.e);G.mad=clamp(G.mad+x.b+lo);G.pow+=x.p;G.td++;G.gap++;G.hour=Math.min(17,G.hour+x.h);
  G.loy=clamp(G.loy-(x.b>=14?1:0));G.con=clamp(G.con-cr);
- wob();log(`[${h0}h] Giao: ${t[0]}.`);
- if(Math.random()<t[4]*(1.3-.6*G.loy/100)){const c=(2+Math.floor(Math.random()*8))*50000;G.broke++;G.money+=c;G.bud+=c;
+ wob();giveFx();log(`[${h0}h] Giao: ${t[0]}.`);
+ if(Math.random()<t[4]*(1.3-.6*G.loy/100)){const c=(2+Math.floor(Math.random()*8))*50000;G.broke++;G.money+=c;G.bud+=c;breakFx();
   log(`Choang! ${S.boss.name} làm vỡ ${t[1]}. Trừ lương ${c.toLocaleString('vi-VN')}đ.`,1);say('Á! Em không cố ý đâu ạ!')}
  else say(G.mad>45?rnd(MAD):rnd(OKS));
- if(G.en==0){log(`${S.boss.name} ngã quỵ xuống sàn. Bạn bảo "diễn sâu quá".`,1);say('Em... hết... pin...')}
+ if(G.en==0){audio.sfx('sigh');log(`${S.boss.name} ngã quỵ xuống sàn. Bạn bảo "diễn sâu quá".`,1);say('Em... hết... pin...')}
  sched();draw();after();
 }
 function sched(){for(const ev of SCHEDULE[wd()]||[]){const k=G.day+':'+ev.h;if(!G.fired.includes(k)&&G.hour>=ev.h){G.fired.push(k);G.en=clamp(G.en+ev.e);G.mad=clamp(G.mad+ev.m);G.pow+=ev.p;log(`[${ev.h}h] ${ev.t}`,1);say(ev.say)}}}
 function after(){if(G.mad>=100){resign();return}if(G.hour>=17){endDay();return}if(!maybeEvent())deal()}
-function lie(){if(!G||busy)return;G.lies++;G.mad=Math.max(0,G.mad-30);G.loy=clamp(G.loy+(G.lies>5?-3:2));G.con=clamp(G.con-3);log('Bạn hứa: "Tháng sau anh được thăng chức." Không có thật.');say('Thật không ạ? Em tin sếp!');draw()}
-function rest(){if(!G||busy)return;G.en=Math.min(100,G.en+30);G.pow=Math.max(0,G.pow-10);G.loy=clamp(G.loy+2);G.con=clamp(G.con+2);log('Cho nghỉ 5 phút. Quyền lực -10 vì quá nhân từ.');say('Cảm ơn sếp... nhưng chỉ 5 phút thôi à?');draw()}
+function lie(){if(!G||busy)return;audio.sfx('lie');G.lies++;G.mad=Math.max(0,G.mad-30);G.loy=clamp(G.loy+(G.lies>5?-3:2));G.con=clamp(G.con-3);log('Bạn hứa: "Tháng sau anh được thăng chức." Không có thật.');say('Thật không ạ? Em tin sếp!');draw()}
+function rest(){if(!G||busy)return;audio.sfx('relief');G.en=Math.min(100,G.en+30);G.pow=Math.max(0,G.pow-10);G.loy=clamp(G.loy+2);G.con=clamp(G.con+2);log('Cho nghỉ 5 phút. Quyền lực -10 vì quá nhân từ.');say('Cảm ơn sếp... nhưng chỉ 5 phút thôi à?');draw()}
 
 function endDay(){
- busy=true;draw();
+ busy=true;draw();audio.sfx('bell');
  const s=G.snap,fri=wd()==4;
  $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>HẾT NGÀY LÀM VIỆC</h2><p style="text-align:center"><b>Tuần ${wk()} · ${DAYS[wd()].name}</b></p>
  <p>Việc đã giao: <b>${G.td}</b><br>Đồ vỡ: <b>${G.broke-s.b}</b><br>Trừ lương: <b>${(G.money-s.m).toLocaleString('vi-VN')}đ</b><br>Đơn nghỉ bị xé: <b>${G.rej-s.r}</b><br>Quyền lực: <b>+${G.pow-s.p}</b><br>Chi phí vận hành: <b>-500.000đ</b> (ngân sách còn <b>${(G.bud-500000).toLocaleString('vi-VN')}đ</b>)</p>
@@ -105,7 +108,7 @@ function maybeEvent(){
 }
 const fill=s=>s.replaceAll('{boss}',S.boss.name);
 function showEv(e){
- CUR=e;busy=true;
+ CUR=e;busy=true;audio.sfx('event');
  $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>${esc(fill(e.t))}</h2><p>${esc(fill(e.x))}</p>${e.ch.map((c,i)=>{const lack=(c[1].bud||0)<0&&G.bud+c[1].bud<0;return `<button class="go alt choice" ${lack?'disabled':''} onclick="pickEv(${i})">${esc(fill(c[0]))}${lack?' (thiếu quỹ)':''}</button>`}).join('')}</div></div>`;
 }
 function pickEv(i){
@@ -121,6 +124,14 @@ function pickEv(i){
 function contEv(){busy=false;$('#m').innerHTML='';if(G.mad>=100){resign();return}deal()}
 
 
+
+// ---- Hiệu ứng và âm thanh gắn vào game ----
+function center(){const a=$('#av').getBoundingClientRect(),s=$('#stg').getBoundingClientRect();return[a.left+a.width/2-s.left,a.top+a.height*.6-s.top]}
+function giveFx(){audio.sfx('give');const[x,y]=center();fx.emit('paper',x,y-50,8)}
+function breakFx(){audio.sfx('break');const[x,y]=center();fx.emit('shard',x,y,18);fx.shake($('#stg'))}
+function syncAudio(){const p=audio.prefs();$('#snd').textContent='Âm thanh: '+(p.sfx?'Bật':'Tắt');$('#mus').textContent='Nhạc: '+(p.mus?'Bật':'Tắt')}
+function tgl(k){audio.toggle(k);syncAudio();audio.sfx('click')}
+
 // ---- Cảm ứng: chạm vào nhân vật, kéo giấy nhớ thả vào nhân vật ----
 let lastPoke=0;
 const POKE={
@@ -135,9 +146,9 @@ function floatTxt(t,x,y){
 }
 function poke(e){
  if(busy||!G||Date.now()-lastPoke<350)return;lastPoke=Date.now();
- const a=$('#av'),r=a.getBoundingClientRect(),f=(e.clientY-r.top)/r.height,z=f<.32?POKE.head:f<.75?POKE.body:POKE.legs;
+ const a=$('#av'),r=a.getBoundingClientRect(),f=(e.clientY-r.top)/r.height,key=f<.32?'head':f<.75?'body':'legs',z=POKE[key];
  G.mad=clamp(G.mad+(z.mad||0));G.loy=clamp(G.loy+(z.loy||0));G.con=clamp(G.con+(z.con||0));G.en=clamp(G.en+(z.en||0));
- say(rnd(z.l));floatTxt(z.t,e.clientX,e.clientY);
+ audio.sfx('poke-'+key);{const s=$('#stg').getBoundingClientRect();fx.emit('spark',e.clientX-s.left,e.clientY-s.top,8)}say(rnd(z.l));floatTxt(z.t,e.clientX,e.clientY);
  a.classList.add('poke');setTimeout(()=>a.classList.remove('poke'),400);
  draw();if(G.mad>=100)resign();
 }
@@ -146,7 +157,7 @@ function bindNotes(){
  const box=$('#notes');
  box.onclick=e=>{if(e.detail===0){const b=e.target.closest('.note');if(b)act(+b.dataset.i)}};
  box.onpointerdown=e=>{
-  const b=e.target.closest('.note');if(!b||busy)return;
+  const b=e.target.closest('.note');if(!b||busy)return;audio.sfx('pick');
   const i=+b.dataset.i,r=b.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;let drag=null;
   const mv=ev=>{
    if(!drag&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>10){
@@ -166,20 +177,25 @@ function bindNotes(){
 }
 
 function resign(){
- busy=true;draw('cry');
+ busy=true;draw('cry');audio.sfx('resign');fx.flash($('#stg'));fx.shake($('#stg'),300);
  $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>ĐƠN XIN NGHỈ VIỆC</h2><p>Kính gửi ${S.role} ${esc(S.me.name)},</p><p>Tôi, <b>${esc(S.boss.name)}</b>, xin nghỉ việc vì: <i>${rnd(LEAVE)}</i></p>
  <p style="text-align:right">Ký tên: ${esc(S.boss.name)} (đã khóc)</p>
  <button class="go" style="font-size:16px" onclick="rej()">Không duyệt (xé đơn)</button> <button class="go alt" style="font-size:16px" onclick="ok()">Duyệt</button><div class="toast" id="ts"></div></div></div>`;
 }
 function ok(){$('#ts').textContent='Hệ thống: Bạn không đủ quyền hạn để duyệt đơn này.'}
+let rejB=false;
 function rej(){
- G.rej++;G.loy=clamp(G.loy-4);G.con=clamp(G.con-3);G.mad=55;G.en=Math.max(15,G.en-10);G.pow+=40;busy=false;$('#m').innerHTML='';
+ if(rejB)return;rejB=true;audio.sfx('stamp');document.querySelector('.paper')?.insertAdjacentHTML?.('beforeend','<div class="stamp">KHÔNG DUYỆT</div>');setTimeout(finishRej,650);
+}
+function finishRej(){
+ rejB=false;G.rej++;G.loy=clamp(G.loy-4);G.con=clamp(G.con-3);G.mad=55;G.en=Math.max(15,G.en-10);G.pow+=40;busy=false;$('#m').innerHTML='';
  log(`Bạn xé đơn xin nghỉ việc lần thứ ${G.rej}. Tăng KPI cho ${S.boss.name}.`,1);say('...Dạ vâng. Em hiểu rồi ạ.');draw();after();
 }
 
 function randomize(){const o=S[S.tab];for(const k of Object.keys(OPT)){const a=OPT[k];o[k]=a[Math.floor(Math.random()*a.length)][1]}setup()}
-function menu(){busy=false;$('#m')&&($('#m').innerHTML='');setup()}
+function menu(){audio.music(false);busy=false;$('#m')&&($('#m').innerHTML='');setup()}
 function wipe(){if(confirm('Xóa nhân vật và ca làm việc đã lưu?')){clearAll();location.reload()}}
 function setName(v){S[S.tab].name=v;saveChar()}
-Object.assign(window,{pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+Object.assign(window,{tgl,pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+typeof addEventListener=='function'&&addEventListener('pointerdown',()=>audio.unlock(),{once:true});
 loadChar();setup();
