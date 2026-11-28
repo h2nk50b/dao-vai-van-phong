@@ -28,7 +28,23 @@ export const POOL=[
  ['Dắt chó của tôi đi dạo (nó đang ở Vũng Tàu)','dây dắt chó',20,16,.1,20],
  ['Rót trà đúng 70 độ, không hơn không kém','ấm trà',10,10,.25,12],
  ['Xếp lại ghế phòng họp theo thứ tự chiều cao','ghế',15,12,.3,15],
- ['Khiêng bình nước 20 lít lên tầng 5 (không thang máy)','bình nước',22,12,.3,20]
+ ['Khiêng bình nước 20 lít lên tầng 5 (không thang máy)','bình nước',22,12,.3,20],
+ ['Tìm cây bút tôi vừa cầm trên tay','bút',6,10,.05,10],
+ ['Gọi từng người hỏi "đã nhận được email chưa"','điện thoại',12,12,.1,14],
+ ['Ngồi đợi tôi họp xong để nhắc tôi đi họp','ghế',14,10,.1,12],
+ ['In biên bản họp rồi đóng thành 10 quyển trang trí','máy in',14,12,.2,14],
+ ['Bóc 200 quả quýt trước 10 giờ','đĩa quýt',16,12,.05,14],
+ ['Đi mua đúng loại bút bi tôi quên tên','bút',14,14,.1,16],
+ ['Sắp xếp tủ hồ sơ theo màu của cảm xúc','tủ hồ sơ',18,14,.25,18],
+ ['Tập dợt bài phát biểu nhận giải (không có giải)','micro',10,10,.1,12],
+ ['Đứng gác cửa để không ai làm phiền "buổi suy nghĩ"','ghế',12,10,.05,12],
+ ['Tưới cây giả ngày 3 lần','bình tưới',8,10,.1,10],
+ ['Mở cửa, đóng cửa, mở cửa cho tôi có cảm giác được đón','cửa kính',10,12,.2,14],
+ ['Tìm WiFi mạnh hơn ở góc nhà vệ sinh','router',16,12,.2,15],
+ ['Khiêng ghế massage của tôi từ tầng 1 lên tầng 4','ghế massage',22,12,.35,22],
+ ['Học thuộc tên 80 nhân viên rồi quên hết','sổ tay',10,12,.05,12],
+ ['Pha 3 ly trà đá: nhiều đá, ít đá, không đá','ly',12,10,.2,12],
+ ['Đọc to lời khen của khách hàng cho tôi nghe mỗi sáng','file khen',8,8,.02,10]
 ];
 export const OKS=['Dạ... vâng ạ.','Em làm ngay, thưa sếp.','(thở dài thườn thượt) Vâng...','Dạ, đang làm... đang làm...','Hôm qua em cũng làm cái này mà...'];
 export const MAD=['Chỗ này đáng lương hơn chứ nhỉ...','Em là nhân viên chứ không phải con quay ạ!','Hồi em làm sếp em đâu có thế này!','Sếp có biết tay em sắp rụng không?','Thế này là bóc lột sức lao động!'];

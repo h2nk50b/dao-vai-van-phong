@@ -77,3 +77,4 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 .ver{text-align:center;color:var(--mute);font-size:12px;margin:10px 0 16px}
 @media(max-width:720px){.gg .stage{min-height:370px}.stage svg{height:220px}}
 .banner{background:var(--note);color:#1b2a41;border:2px solid var(--ink);padding:6px 10px;font-weight:600;font-size:14px;margin:0 0 12px}
+.paper{max-height:90vh;overflow:auto}.choice{display:block;width:100%;margin:8px 0 0;font-size:15px;padding:10px 14px;text-align:left;box-shadow:3px 3px 0 var(--ink)}.choice:disabled{opacity:.5;cursor:not-allowed}.delta{font-size:13px;color:#5b6b7d}

@@ -18,3 +18,6 @@ Hoạt hình phẳng, viền xanh đen #1b2a41 dày 2.4, bóng đổ cứng 5px.
 
 ## Ngày làm việc (v0.8)
 Mỗi việc tốn 1–2 giờ trong ngày 8h–17h. Hết ngày sang hôm sau; 5 ngày là 1 tuần. Mỗi thứ có hiệu ứng riêng (DAYS) và sự kiện theo giờ (SCHEDULE) trong data.js.
+
+## Chỉ số và sự kiện (v0.11)
+Thêm Lòng trung thành, Lương tâm, Ngân sách. Sự kiện ngẫu nhiên nằm ở events.js (31 sự kiện, có điều kiện theo thứ, giờ, chỉ số). Nhiệm vụ ở data.js (30 việc).
