@@ -32,7 +32,7 @@ function start(fresh=true){
  audio.unlock();
  S.me.name=S.me.name||'Bạn';S.boss.name=S.boss.name||'Hùng';
  G=Object.assign(NEWG(),fresh?{}:(loadGame()||{}));
- $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div><div class="tools"><button class="chip" id="snd" onclick="tgl('sfx')"></button><button class="chip" id="mus" onclick="tgl('mus')"></button><button class="chip" id="vox" onclick="tglVox()"></button></div></div>
+ $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div><div class="tools"><button class="chip" id="snd" onclick="tgl('sfx')"></button><button class="chip" id="mus" onclick="tgl('mus')"></button><button class="chip" id="vox" onclick="tglVox()"></button><button class="chip" id="tst" onclick="testSound()">Thử loa</button></div></div>
  <p class="stats" id="st"></p>
  <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub" aria-live="polite"></div><div id="av"></div><span class="tag" id="tg"></span></div>
  <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="banner" id="bn"></div><div class="notes" id="notes"></div><p class="hint">Mẹo: chạm vào nhân vật để trêu, hoặc kéo giấy nhớ rồi thả vào sếp cũ.</p>
@@ -148,6 +148,7 @@ function center(){const a=$('#av').getBoundingClientRect(),s=$('#stg').getBoundi
 function giveFx(){audio.sfx('give');const[x,y]=center();fx.emit('paper',x,y-50,8)}
 function breakFx(){audio.sfx('break');const[x,y]=center();fx.emit('shard',x,y,18);fx.shake($('#stg'))}
 function syncAudio(){const vm=voice.getMode();$('#vox').textContent='Giọng: '+(vm=='tts'?'Nói thật':vm=='babble'?'Ú ớ':'Tắt');const p=audio.prefs();$('#snd').textContent='Âm thanh: '+(p.sfx?'Bật':'Tắt');$('#mus').textContent='Nhạc: '+(p.mus?'Bật':'Tắt')}
+function testSound(){audio.unlock();audio.test();const s=audio.status();log(s=='running'?'Đang phát tiếng thử. Nếu vẫn không nghe: tăng âm lượng phương tiện (media), tắt chế độ im lặng của iPhone, hoặc thử trình duyệt khác.':'Âm thanh chưa bật (trạng thái: '+s+'). Hãy chạm vào màn hình rồi bấm Thử loa lần nữa.',s!='running')}
 function tglVox(){voice.cycle();syncAudio();audio.sfx('click')}
 function tgl(k){audio.toggle(k);syncAudio();audio.sfx('click')}
 
@@ -215,7 +216,7 @@ function randomize(){const o=S[S.tab];for(const k of Object.keys(OPT)){const a=O
 function menu(){voice.stop();audio.music(false);busy=false;$('#m')&&($('#m').innerHTML='');setup()}
 function wipe(){if(confirm('Xóa nhân vật và ca làm việc đã lưu?')){clearAll();location.reload()}}
 function setName(v){S[S.tab].name=v;saveChar()}
-Object.assign(window,{tglVox,tgl,pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+Object.assign(window,{testSound,tglVox,tgl,pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
 voice.init();
-typeof addEventListener=='function'&&addEventListener('pointerdown',()=>audio.unlock(),{once:true});
+if(typeof addEventListener=='function')audio.autoUnlock();
 loadChar();setup();

@@ -1,15 +1,19 @@
 // Âm thanh tạo bằng Web Audio (không cần file, không tốn dung lượng). Có thể thay bằng file CC0 sau này.
-let ctx=null,master,sfxG,musG,timer=null,mood='ok',step=0;
+let ctx=null,master,sfxG,musG,vocG,timer=null,mood='ok',step=0;
 const pref={sfx:true,mus:true};
 try{Object.assign(pref,JSON.parse(localStorage.getItem('dvvp_audio')))}catch(e){}
 export const prefs=()=>pref;
 export function unlock(){
  if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
-  ctx=new AC();master=ctx.createGain();master.gain.value=.8;master.connect(ctx.destination);
+  ctx=new AC();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);
+  vocG=ctx.createGain();vocG.gain.value=1;vocG.connect(master);
+  try{const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}
   sfxG=ctx.createGain();sfxG.gain.value=pref.sfx?1:0;sfxG.connect(master);
   musG=ctx.createGain();musG.gain.value=pref.mus?.5:0;musG.connect(master)}
- if(ctx.state=='suspended')ctx.resume();
+ if(ctx.state!=='running')ctx.resume();
 }
+export const status=()=>ctx?ctx.state:(window.AudioContext||window.webkitAudioContext?'chưa khởi tạo':'không hỗ trợ');
+export function autoUnlock(){['pointerdown','touchend','keydown','click'].forEach(e=>addEventListener(e,unlock,{passive:true}))}
 export function toggle(k){
  pref[k]=!pref[k];try{localStorage.setItem('dvvp_audio',JSON.stringify(pref))}catch(e){}
  if(ctx)(k=='sfx'?sfxG:musG).gain.value=pref[k]?(k=='sfx'?1:.5):0;return pref[k];
@@ -62,5 +66,11 @@ export function music(on){
  if(on&&ctx){step=0;timer=setInterval(tick,BPM[mood]||480)}
 }
 export function setMood(m){if(m&&m!==mood){mood=m;if(timer)music(true)}}
-// Giọng "ú ớ" kiểu game hoạt hình: mỗi từ một tiếng bíp, cao độ khác nhau theo nhân vật. Trả về thời lượng (ms).
-export function babble(who,n){const base=who=='boss'?340:170;let t=0;for(let i=0;i<n;i++){tone(base*(.8+Math.random()*.7),.08,'square',.05,null,t/1000);t+=110}return t+100}
+// Giọng "ú ớ" kiểu game hoạt hình: mỗi từ một tiếng bíp, cao độ khác nhau theo nhân vật. Đi qua kênh riêng (không bị tắt theo nút Âm thanh). Trả về thời lượng (ms).
+export function babble(who,n){
+ const base=who=='boss'?340:170;let t=0;
+ for(let i=0;i<n;i++){const f=base*(.8+Math.random()*.7);tone(f,.1,'triangle',.3,null,t/1000,vocG);tone(f*2,.08,'square',.06,null,t/1000,vocG);t+=125}
+ return t+120;
+}
+// Phát thử để kiểm tra loa
+export function test(){if(!ctx)return;tone(880,.25,'sine',.4,null,0,vocG);babble('boss',3)}
