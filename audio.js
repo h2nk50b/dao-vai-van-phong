@@ -62,3 +62,5 @@ export function music(on){
  if(on&&ctx){step=0;timer=setInterval(tick,BPM[mood]||480)}
 }
 export function setMood(m){if(m&&m!==mood){mood=m;if(timer)music(true)}}
+// Giọng "ú ớ" kiểu game hoạt hình: mỗi từ một tiếng bíp, cao độ khác nhau theo nhân vật. Trả về thời lượng (ms).
+export function babble(who,n){const base=who=='boss'?340:170;let t=0;for(let i=0;i<n;i++){tone(base*(.8+Math.random()*.7),.08,'square',.05,null,t/1000);t+=110}return t+100}

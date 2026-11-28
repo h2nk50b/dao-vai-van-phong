@@ -24,3 +24,9 @@ Thêm Lòng trung thành, Lương tâm, Ngân sách. Sự kiện ngẫu nhiên n
 
 ## Âm thanh & hiệu ứng (v0.13)
 audio.js: âm thanh và nhạc nền tự sinh bằng Web Audio (không dùng file). fx.js: hạt giấy, mảnh vỡ, tia sáng, rung màn hình. Tắt/bật ở góc trên bên phải.
+
+## Giọng nói (v0.14)
+voice.js chọn theo thứ tự: (1) file thu sẵn nếu có trong voice/index.json, (2) giọng tiếng Việt của trình duyệt (Web Speech), (3) giọng "ú ớ" nếu máy không có tiếng Việt.
+Dùng giọng thu sẵn: bỏ file âm thanh vào thư mục voice/ rồi khai báo trong voice/index.json theo mẫu:
+{"boss":{"Dạ... vâng ạ.":"boss_vang.mp3"},"me":{"Hùng, pha cà phê.":"me_01.mp3"}}
+(khóa phải trùng đúng từng chữ với câu thoại trong game)

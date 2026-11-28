@@ -4,6 +4,7 @@ import {scene} from './scene.js';
 import {EVENTS} from './events.js';
 import * as audio from './audio.js';
 import * as fx from './fx.js';
+import * as voice from './voice.js';
 import {S,clearAll,saveChar,loadChar,saveGame,loadGame,hasGame} from './state.js';
 const $=s=>document.querySelector(s);
 function setup(){saveChar();
@@ -31,7 +32,7 @@ function start(fresh=true){
  audio.unlock();
  S.me.name=S.me.name||'Bạn';S.boss.name=S.boss.name||'Hùng';
  G=Object.assign(NEWG(),fresh?{}:(loadGame()||{}));
- $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div><div class="tools"><button class="chip" id="snd" onclick="tgl('sfx')"></button><button class="chip" id="mus" onclick="tgl('mus')"></button></div></div>
+ $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div><div class="tools"><button class="chip" id="snd" onclick="tgl('sfx')"></button><button class="chip" id="mus" onclick="tgl('mus')"></button><button class="chip" id="vox" onclick="tglVox()"></button></div></div>
  <p class="stats" id="st"></p>
  <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub" aria-live="polite"></div><div id="av"></div><span class="tag" id="tg"></span></div>
  <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="banner" id="bn"></div><div class="notes" id="notes"></div><p class="hint">Mẹo: chạm vào nhân vật để trêu, hoặc kéo giấy nhớ rồi thả vào sếp cũ.</p>
@@ -39,6 +40,7 @@ function start(fresh=true){
  <div class="log" id="log" role="log"></div></div></div><div id="m"></div>`;
  busy=false;fx.mount($('#stg'));syncAudio();audio.music(true);deal();draw('ok');$('#av').onclick=poke;bindNotes();say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
  log(fresh?`${S.boss.name} đã nhận bàn ở góc khuất cạnh nhà vệ sinh.`:'Tiếp tục ca làm việc đang dở.');
+ setTimeout(()=>{syncAudio();if(voice.getMode()=='babble'&&!voice.hasVN())log('Máy chưa có giọng tiếng Việt nên nhân vật đang nói "ú ớ". Hãy thêm giọng tiếng Việt trong phần cài đặt Văn bản sang giọng nói (tùy máy) để nghe nói thật.',1)},900);
  if(G.mad>=100)resign();else if(G.hour>=17)endDay();
 }
 function deal(){
@@ -46,12 +48,28 @@ function deal(){
  $('#notes').innerHTML=hand.map((t,i)=>{const x=eff(t);return `<button class="note" style="--r:${[-2,1.5,-1,2.5][i]}deg" data-i="${i}">${t[0]}<small>Tốn ${x.e} sức · ${x.h} giờ · +${x.p} quyền lực</small></button>`}).join('');
 }
 function mood(){return G.mad>=90?'cry':G.mad>=65?'angry':G.en<30?'tired':'ok'}
-function draw(m){saveGame(G);audio.setMood(m||mood());$('#sc').innerHTML=scene(G.hour,G.td);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
+function draw(m){saveGame(G);audio.setMood(m||mood());$('#sc').innerHTML=scene(G.hour,G.td);$('#av').innerHTML=av(S.boss,m||mood());if(talking)$('#av svg')?.classList.add('talking');$('#tg').textContent='Nhân viên '+S.boss.name;
  $('#b1').style.width=G.en+'%';$('#b2').style.width=G.mad+'%';$('#b3').style.width=((G.hour-8)/9*100)+'%';$('#b4').style.width=G.loy+'%';$('#b5').style.width=G.con+'%';$('#tm').textContent='Giờ: '+G.hour+':00';
  $('#bn').textContent=DAYS[wd()].name+': '+DAYS[wd()].note;
  const r=G.pow<100?'Sếp tập sự':G.pow<300?'Sếp thứ thiệt':G.pow<600?'Sếp độc tài':'Bạo chúa văn phòng';
  $('#st').innerHTML=`<span>Tuần <b>${wk()}</b> · <b>${DAYS[wd()].name}</b></span><span>Danh hiệu: <b>${r}</b></span><span>Quyền lực: <b>${G.pow}</b></span><span>Ngân sách: <b>${G.bud.toLocaleString('vi-VN')}đ</b></span><span>Đồ vỡ: <b>${G.broke}</b></span><span>Trừ lương: <b>${G.money.toLocaleString('vi-VN')}đ</b></span><span>Đơn nghỉ bị xé: <b>${G.rej}</b></span><span>Bánh vẽ: <b>${G.lies}</b></span>`}
-function say(t){$('#bub').textContent=t}
+// ---- Hội thoại có giọng nói ----
+let dlg=0,talking=false,buf=[],flushQ=false;
+const lf=s=>s.charAt(0).toLowerCase()+s.slice(1);
+function setMouth(on,who){on=on&&who=='boss';talking=on;$('#av svg')?.classList.toggle('talking',on)}
+function setBubble(who,t){const b=$('#bub');b.className='bubble'+(who=='me'?' me':'');b.textContent=(who=='me'?S.me.name+': ':'')+t}
+async function dialog(L){
+ const id=++dlg;voice.stop();setMouth(false,'boss');
+ for(const [who,t,quiet] of L){
+  if(id!==dlg)return;setBubble(who,t);
+  if(!quiet)await voice.speak(who,t,setMouth);
+ }
+}
+function say(t,who='boss',quiet=false){
+ buf.push([who,t,quiet]);
+ if(!flushQ){flushQ=true;queueMicrotask(()=>{flushQ=false;const L=buf;buf=[];
+  const me=L.find(l=>l[0]=='me'),bo=[...L].reverse().find(l=>l[0]=='boss');dialog([me,bo].filter(Boolean))})}
+}
 function log(t,bad){const p=document.createElement('p');p.textContent=t;if(bad)p.className='bad';$('#log').prepend(p)}
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 function wob(){const a=$('#av');a.classList.add('bowing');setTimeout(()=>a.classList.remove('bowing'),900)}
@@ -61,7 +79,7 @@ function act(i){
  const lo=G.loy<25?2:G.loy>=75?-2:0,cr=x.b>=16?1:0;
  G.en=clamp(G.en-x.e);G.mad=clamp(G.mad+x.b+lo);G.pow+=x.p;G.td++;G.gap++;G.hour=Math.min(17,G.hour+x.h);
  G.loy=clamp(G.loy-(x.b>=14?1:0));G.con=clamp(G.con-cr);
- wob();giveFx();log(`[${h0}h] Giao: ${t[0]}.`);
+ wob();giveFx();say(`${S.boss.name}, ${lf(t[0])}.`,'me');log(`[${h0}h] Giao: ${t[0]}.`);
  if(Math.random()<t[4]*(1.3-.6*G.loy/100)){const c=(2+Math.floor(Math.random()*8))*50000;G.broke++;G.money+=c;G.bud+=c;breakFx();
   log(`Choang! ${S.boss.name} làm vỡ ${t[1]}. Trừ lương ${c.toLocaleString('vi-VN')}đ.`,1);say('Á! Em không cố ý đâu ạ!')}
  else say(G.mad>45?rnd(MAD):rnd(OKS));
@@ -115,7 +133,7 @@ function pickEv(i){
  const c=CUR.ch[i],f=c[1],res=fill(c[2]);
  for(const k of ['en','mad','loy','con'])if(f[k])G[k]=clamp(G[k]+f[k]);
  if(f.pow)G.pow=Math.max(0,G.pow+f.pow);if(f.bud)G.bud+=f.bud;
- log(`[Sự kiện] ${fill(CUR.t)}: ${res}`);say(res.length>90?res.slice(0,87)+'...':res);
+ log(`[Sự kiện] ${fill(CUR.t)}: ${res}`);say(res.length>90?res.slice(0,87)+'...':res,'boss',true);
  const nm={en:'Sức lực',mad:'Độ bực',pow:'Quyền lực',loy:'Trung thành',con:'Lương tâm',bud:'Ngân sách'};
  const delta=Object.entries(f).map(([k,v])=>nm[k]+' '+(v>0?'+':'')+(k=='bud'?v.toLocaleString('vi-VN')+'đ':v)).join(' · ');
  $('#m').innerHTML=`<div class="modal"><div class="paper"><h2>${esc(fill(CUR.t))}</h2><p>${esc(res)}</p>${delta?`<p class="delta">${esc(delta)}</p>`:''}<button class="go" onclick="contEv()">Tiếp tục</button></div></div>`;
@@ -129,7 +147,8 @@ function contEv(){busy=false;$('#m').innerHTML='';if(G.mad>=100){resign();return
 function center(){const a=$('#av').getBoundingClientRect(),s=$('#stg').getBoundingClientRect();return[a.left+a.width/2-s.left,a.top+a.height*.6-s.top]}
 function giveFx(){audio.sfx('give');const[x,y]=center();fx.emit('paper',x,y-50,8)}
 function breakFx(){audio.sfx('break');const[x,y]=center();fx.emit('shard',x,y,18);fx.shake($('#stg'))}
-function syncAudio(){const p=audio.prefs();$('#snd').textContent='Âm thanh: '+(p.sfx?'Bật':'Tắt');$('#mus').textContent='Nhạc: '+(p.mus?'Bật':'Tắt')}
+function syncAudio(){const vm=voice.getMode();$('#vox').textContent='Giọng: '+(vm=='tts'?'Nói thật':vm=='babble'?'Ú ớ':'Tắt');const p=audio.prefs();$('#snd').textContent='Âm thanh: '+(p.sfx?'Bật':'Tắt');$('#mus').textContent='Nhạc: '+(p.mus?'Bật':'Tắt')}
+function tglVox(){voice.cycle();syncAudio();audio.sfx('click')}
 function tgl(k){audio.toggle(k);syncAudio();audio.sfx('click')}
 
 // ---- Cảm ứng: chạm vào nhân vật, kéo giấy nhớ thả vào nhân vật ----
@@ -193,9 +212,10 @@ function finishRej(){
 }
 
 function randomize(){const o=S[S.tab];for(const k of Object.keys(OPT)){const a=OPT[k];o[k]=a[Math.floor(Math.random()*a.length)][1]}setup()}
-function menu(){audio.music(false);busy=false;$('#m')&&($('#m').innerHTML='');setup()}
+function menu(){voice.stop();audio.music(false);busy=false;$('#m')&&($('#m').innerHTML='');setup()}
 function wipe(){if(confirm('Xóa nhân vật và ca làm việc đã lưu?')){clearAll();location.reload()}}
 function setName(v){S[S.tab].name=v;saveChar()}
-Object.assign(window,{tgl,pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+Object.assign(window,{tglVox,tgl,pickEv,contEv,nextDay,menu,wipe,randomize,S,setup,tab,pick,applyDesc,setName,start,act,lie,rest,rej,ok});
+voice.init();
 typeof addEventListener=='function'&&addEventListener('pointerdown',()=>audio.unlock(),{once:true});
 loadChar();setup();

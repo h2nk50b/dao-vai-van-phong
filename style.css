@@ -99,3 +99,8 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 @keyframes stp{from{transform:translate(-50%,-50%) rotate(-12deg) scale(2.6);opacity:0}}
 .tools{display:flex;gap:6px;margin-left:auto}
 @media(prefers-reduced-motion:reduce){.stage.shake,.stage.flash::after,.modal,.paper,.stamp{animation:none}}
+.mouth{transform-box:fill-box;transform-origin:50% 20%}
+.talking .mouth{animation:talk .16s infinite alternate}
+@keyframes talk{to{transform:scale(.9,1.9)}}
+.bubble.me{background:#ffe45e}
+@media(prefers-reduced-motion:reduce){.talking .mouth{animation:none}}

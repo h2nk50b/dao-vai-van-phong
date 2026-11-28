@@ -44,7 +44,7 @@ export function av(o,mood){
  <circle cx="39" cy="49" r="5" fill="${sk}" ${sw}/><circle cx="81" cy="49" r="5" fill="${sk}" ${sw}/>
  <ellipse cx="60" cy="46" rx="21" ry="22" fill="${sk}" ${sw}/>
  <ellipse cx="46" cy="57" rx="4.5" ry="3" fill="#f2828a" opacity=".4"/><ellipse cx="74" cy="57" rx="4.5" ry="3" fill="#f2828a" opacity=".4"/>
- ${beard}<g class="eyes">${eyes}</g><path d="${brows}" ${S(2.6)} fill="none"/><path d="M59 50Q63 54 59 56" stroke="${sd}" stroke-width="2" fill="none" stroke-linecap="round"/>${mouthEl}${mask}${extra}
+ ${beard}<g class="eyes">${eyes}</g><path d="${brows}" ${S(2.6)} fill="none"/><path d="M59 50Q63 54 59 56" stroke="${sd}" stroke-width="2" fill="none" stroke-linecap="round"/><g class="mouth">${mouthEl}</g>${mask}${extra}
  ${hair}${gl}${cap}</g></g></g></svg>`;
 }
 
