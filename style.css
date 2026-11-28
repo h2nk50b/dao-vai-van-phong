@@ -78,3 +78,13 @@ input[type=text],textarea{width:100%;font:inherit;padding:8px 10px;border:2px so
 @media(max-width:720px){.gg .stage{min-height:370px}.stage svg{height:220px}}
 .banner{background:var(--note);color:#1b2a41;border:2px solid var(--ink);padding:6px 10px;font-weight:600;font-size:14px;margin:0 0 12px}
 .paper{max-height:90vh;overflow:auto}.choice{display:block;width:100%;margin:8px 0 0;font-size:15px;padding:10px 14px;text-align:left;box-shadow:3px 3px 0 var(--ink)}.choice:disabled{opacity:.5;cursor:not-allowed}.delta{font-size:13px;color:#5b6b7d}
+#av{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#av.target{outline:3px dashed #ffe45e;outline-offset:6px;border-radius:14px;background:rgba(255,228,94,.18)}
+.poke .fig{animation:poke .35s ease-out}
+@keyframes poke{30%{transform:scale(.94,1.05) rotate(-3deg)}65%{transform:translateX(3px) rotate(2deg)}}
+.stage>.fl{position:absolute!important;z-index:5;font-weight:800;font-size:14px;color:#fff;text-shadow:0 2px 0 #1b2a41,0 0 4px #1b2a41;pointer-events:none;animation:fl 1s ease-out forwards;white-space:nowrap}
+@keyframes fl{to{transform:translateY(-44px);opacity:0}}
+.note{touch-action:none;user-select:none;-webkit-user-select:none}
+.note.dragging{box-shadow:6px 8px 0 rgba(0,0,0,.4);cursor:grabbing}
+.hint{margin:0 0 12px;font-size:13px;color:var(--mute)}
+@media(prefers-reduced-motion:reduce){.poke .fig{animation:none}.stage>.fl{animation:none;opacity:.9}}

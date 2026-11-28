@@ -31,16 +31,16 @@ function start(fresh=true){
  $('#app').innerHTML=`<div class="hud"><div class="bar"><b>Sức lực</b><i><u id="b1" style="background:#2e9e5b"></u></i></div><div class="bar"><b>Độ bực</b><i><u id="b2" style="background:#d6322f"></u></i></div><div class="bar"><b id="tm">Giờ</b><i><u id="b3" style="background:#3b73c4"></u></i></div><div class="bar"><b>Trung thành</b><i><u id="b4" style="background:#e8b93a"></u></i></div><div class="bar"><b>Lương tâm</b><i><u id="b5" style="background:#8a5fd1"></u></i></div></div>
  <p class="stats" id="st"></p>
  <div class="grid gg"><div class="stage" id="stg"><div class="scene" id="sc"></div><div class="bubble" id="bub" aria-live="polite"></div><div id="av"></div><span class="tag" id="tg"></span></div>
- <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="banner" id="bn"></div><div class="notes" id="notes"></div>
+ <div class="panel"><h2>${esc(S.me.name)} ${S.role} giao việc hôm nay</h2><div class="banner" id="bn"></div><div class="notes" id="notes"></div><p class="hint">Mẹo: chạm vào nhân vật để trêu, hoặc kéo giấy nhớ rồi thả vào sếp cũ.</p>
  <button class="go alt" style="margin:0 6px 12px 0;font-size:15px;padding:8px 14px" onclick="lie()">Vẽ bánh: hứa thăng chức</button><button class="go alt" style="margin:0 0 12px;font-size:15px;padding:8px 14px" onclick="rest()">Cho nghỉ 5 phút</button><button class="go alt" style="margin:0 0 12px 6px;font-size:15px;padding:8px 14px" onclick="menu()">Về menu</button>
  <div class="log" id="log" role="log"></div></div></div><div id="m"></div>`;
- busy=false;deal();draw('ok');say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
+ busy=false;deal();draw('ok');$('#av').onclick=poke;bindNotes();say(fresh?'Dạ, chào '+S.role.toLowerCase()+'. Hôm nay em làm gì ạ?':'Dạ, sếp quay lại rồi ạ. Em vẫn ở đây...');
  log(fresh?`${S.boss.name} đã nhận bàn ở góc khuất cạnh nhà vệ sinh.`:'Tiếp tục ca làm việc đang dở.');
  if(G.mad>=100)resign();else if(G.hour>=17)endDay();
 }
 function deal(){
  hand=[...POOL].sort(()=>Math.random()-.5).slice(0,4);
- $('#notes').innerHTML=hand.map((t,i)=>{const x=eff(t);return `<button class="note" style="--r:${[-2,1.5,-1,2.5][i]}deg" onclick="act(${i})">${t[0]}<small>Tốn ${x.e} sức · ${x.h} giờ · +${x.p} quyền lực</small></button>`}).join('');
+ $('#notes').innerHTML=hand.map((t,i)=>{const x=eff(t);return `<button class="note" style="--r:${[-2,1.5,-1,2.5][i]}deg" data-i="${i}">${t[0]}<small>Tốn ${x.e} sức · ${x.h} giờ · +${x.p} quyền lực</small></button>`}).join('');
 }
 function mood(){return G.mad>=90?'cry':G.mad>=65?'angry':G.en<30?'tired':'ok'}
 function draw(m){saveGame(G);$('#sc').innerHTML=scene(G.hour,G.td);$('#av').innerHTML=av(S.boss,m||mood());$('#tg').textContent='Nhân viên '+S.boss.name;
@@ -119,6 +119,51 @@ function pickEv(i){
  draw();
 }
 function contEv(){busy=false;$('#m').innerHTML='';if(G.mad>=100){resign();return}deal()}
+
+
+// ---- Cảm ứng: chạm vào nhân vật, kéo giấy nhớ thả vào nhân vật ----
+let lastPoke=0;
+const POKE={
+ head:{l:['Ái! Sao sếp lại gõ đầu em?','Em không phải cái chuông ạ!','Đau... nhưng em không dám nói.'],mad:3,con:-1,t:'Bực +3'},
+ body:{l:['Dạ... sếp vỗ vai em ạ?','Em xúc động quá...','Sếp tốt quá, em suýt khóc.'],mad:-2,loy:1,con:1,t:'Bực -2 · Trung thành +1'},
+ legs:{l:['Ơ! Em vấp rồi!','Sếp dẫm lên chân em ạ?','Em đi giày đôi chứ không phải giày đạp ạ.'],en:-2,t:'Sức -2'}
+};
+function floatTxt(t,x,y){
+ const s=$('#stg');if(!s||!s.getBoundingClientRect)return;const r=s.getBoundingClientRect();
+ const f=document.createElement('span');f.className='fl';f.textContent=t;f.style.left=(x-r.left)+'px';f.style.top=(y-r.top)+'px';
+ s.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+function poke(e){
+ if(busy||!G||Date.now()-lastPoke<350)return;lastPoke=Date.now();
+ const a=$('#av'),r=a.getBoundingClientRect(),f=(e.clientY-r.top)/r.height,z=f<.32?POKE.head:f<.75?POKE.body:POKE.legs;
+ G.mad=clamp(G.mad+(z.mad||0));G.loy=clamp(G.loy+(z.loy||0));G.con=clamp(G.con+(z.con||0));G.en=clamp(G.en+(z.en||0));
+ say(rnd(z.l));floatTxt(z.t,e.clientX,e.clientY);
+ a.classList.add('poke');setTimeout(()=>a.classList.remove('poke'),400);
+ draw();if(G.mad>=100)resign();
+}
+const hit=ev=>{const r=$('#av').getBoundingClientRect();return ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom};
+function bindNotes(){
+ const box=$('#notes');
+ box.onclick=e=>{if(e.detail===0){const b=e.target.closest('.note');if(b)act(+b.dataset.i)}};
+ box.onpointerdown=e=>{
+  const b=e.target.closest('.note');if(!b||busy)return;
+  const i=+b.dataset.i,r=b.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;let drag=null;
+  const mv=ev=>{
+   if(!drag&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>10){
+    drag=b.cloneNode(true);drag.classList.add('dragging');
+    drag.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;z-index:30;pointer-events:none`;
+    document.body.appendChild(drag);b.style.opacity='.3';
+   }
+   if(drag){drag.style.transform=`translate(${ev.clientX-sx}px,${ev.clientY-sy}px) rotate(5deg)`;$('#av').classList.toggle('target',hit(ev))}
+  };
+  const end=ev=>{
+   removeEventListener('pointermove',mv);removeEventListener('pointerup',end);removeEventListener('pointercancel',end);
+   if(drag){const ok=ev.type=='pointerup'&&hit(ev);drag.remove();b.style.opacity='';$('#av').classList.remove('target');if(ok)act(i)}
+   else if(ev.type=='pointerup')act(i);
+  };
+  addEventListener('pointermove',mv);addEventListener('pointerup',end);addEventListener('pointercancel',end);
+ };
+}
 
 function resign(){
  busy=true;draw('cry');
